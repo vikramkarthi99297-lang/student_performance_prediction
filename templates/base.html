@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{ title or 'Student Performance Prediction System' }}</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+{% if user %}
+<aside>
+  <div class="brand">
+    <i class="fa-solid fa-graduation-cap"></i>
+    <span>SPPS<small>Academic Performance</small></span>
+  </div>
+  <nav>
+    <a href="{{url_for('dashboard')}}"><i class="fa fa-chart-pie"></i> Dashboard</a>
+    <a href="{{url_for('students')}}"><i class="fa fa-users"></i> {{ 'My Students' if user.role=='faculty' else 'Students' }}</a>
+    <a href="{{url_for('student_form')}}"><i class="fa fa-user-plus"></i> Add Student</a>
+    <a href="{{url_for('marks_entry')}}"><i class="fa fa-pen-to-square"></i> Marks Entry</a>
+    <a href="{{url_for('attendance_entry')}}"><i class="fa fa-calendar-check"></i> Attendance</a>
+    <a href="{{url_for('at_risk')}}"><i class="fa fa-triangle-exclamation"></i> At-Risk Students</a>
+    <a href="{{url_for('history')}}"><i class="fa fa-clock-rotate-left"></i> Prediction History</a>
+    {% if user.role=='admin' %}
+    <a href="{{url_for('users')}}"><i class="fa fa-user-gear"></i> User Management</a>
+    {% endif %}
+    <a href="{{url_for('profile')}}"><i class="fa fa-id-badge"></i> Profile</a>
+    <a href="{{url_for('logout')}}"><i class="fa fa-right-from-bracket"></i> Logout</a>
+  </nav>
+</aside>
+<main>
+<header>
+  <button class="menu" onclick="document.querySelector('aside').classList.toggle('open')">☰</button>
+  <div><b>{{ user.faculty.name if user.faculty else user.username }}</b><small>{{ user.role|title }} · {{ user.department or 'College' }}</small></div>
+</header>
+{% endif %}
+<section class="content">
+{% with messages=get_flashed_messages(with_categories=true) %}
+{% for type,msg in messages %}<div class="toast {{type}}">{{msg}}</div>{% endfor %}
+{% endwith %}
+{% block content %}{% endblock %}
+</section>
+{% if user %}</main>{% endif %}
+<script src="{{url_for('static',filename='js/app.js')}}"></script>
+</body>
+</html>

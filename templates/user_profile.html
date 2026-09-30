@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head"><div><h1>My Profile</h1><p>Account and access details.</p></div></div>
+<div class="card profile-card">
+<div class="avatar">{{user.username[0]|upper}}</div>
+<h2>{{user.faculty.name if user.faculty else user.username}}</h2>
+<p><span class="badge low">{{user.role|title}}</span></p>
+<dl>
+<dt>Email</dt><dd>{{user.email}}</dd>
+<dt>Mobile</dt><dd>{{user.phone or '—'}}</dd>
+<dt>Department</dt><dd>{{user.department or '—'}}</dd>
+<dt>Status</dt><dd>{{user.status|title}}</dd>
+<dt>Password</dt><dd>{{'Temporary - change required' if user.password_change_required else 'Permanent'}}</dd>
+</dl>
+</div>
+{% endblock %}

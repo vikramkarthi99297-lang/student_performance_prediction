@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head">
+  <div><h1>{{'Edit Student' if student.id else 'Student Registration'}}</h1><p>Register the student first. Marks and attendance are entered separately.</p></div>
+</div>
+
+<form method="post" class="card form-grid" id="studentForm">
+<input type="hidden" name="_csrf_token" value="{{csrf_token}}">
+<h3>Personal Information</h3>
+
+<label>Student ID
+  <input name="student_id" required value="{{student.student_id or ''}}" pattern="[A-Za-z0-9]+" maxlength="30" placeholder="Example: 2533237">
+  <small>Letters and numbers only.</small>
+</label>
+
+<label>Name
+  <input name="name" required value="{{student.name or ''}}" pattern="[A-Za-z ]{2,120}" maxlength="120" placeholder="Example: Arun Kumar" title="Name must contain letters and spaces only.">
+</label>
+
+<label>Gender
+  <select name="gender"><option value="">Select</option><option {{'selected' if student.gender=='Male'}}>Male</option><option {{'selected' if student.gender=='Female'}}>Female</option><option {{'selected' if student.gender=='Other'}}>Other</option></select>
+</label>
+
+<label>Email
+  <input name="email" type="email" required value="{{student.email or ''}}" placeholder="Example: arun@example.com">
+</label>
+
+<label>Mobile Number
+  <input name="phone" type="tel" required value="{{student.phone or ''}}" pattern="[0-9]{10}" maxlength="10" placeholder="Example: 9876543210">
+</label>
+
+<label>Address
+  <textarea name="address" rows="3" required placeholder="Example: 12 Anna Street, Chennai">{{student.address or ''}}</textarea>
+</label>
+
+<label>Department
+  <input name="department" required value="{{student.department or ''}}" pattern="[A-Za-z ]{2,100}" placeholder="Example: Computer Science">
+</label>
+
+<label>Year
+  <select name="year" required>
+    <option value="">Select Year</option>
+    {% for y in range(1,6) %}<option value="{{y}}" {{'selected' if student.year==y}}>Year {{y}}</option>{% endfor %}
+  </select>
+</label>
+
+<label>Current Semester
+  <select name="semester" required>
+    <option value="">Select Semester</option>
+    {% for sem in range(1,11) %}<option value="{{sem}}" {{'selected' if student.semester==sem}}>Semester {{sem}}</option>{% endfor %}
+  </select>
+</label>
+
+<label>Discipline
+  <select name="discipline" required><option value="Good" {{'selected' if student.discipline!='Bad'}}>Good</option><option value="Bad" {{'selected' if student.discipline=='Bad'}}>Bad</option></select>
+</label>
+
+<label>Number of Arrears
+  <input name="arrears" type="number" min="0" max="99" step="1" required value="{{student.arrears or 0}}" placeholder="Example: 2">
+  <small>Enter 0 if there are no arrears.</small>
+</label>
+
+<div class="form-actions">
+  <button class="primary">{{'Update Student' if student.id else 'Save Student'}}</button>
+  <a class="button secondary" href="{{url_for('students')}}">Cancel</a>
+</div>
+</form>
+
+<script>
+const nameInput=document.querySelector('input[name="name"]');
+const deptInput=document.querySelector('input[name="department"]');
+const idInput=document.querySelector('input[name="student_id"]');
+const phoneInput=document.querySelector('input[name="phone"]');
+nameInput.addEventListener('input',()=>nameInput.value=nameInput.value.replace(/[^A-Za-z ]/g,''));
+deptInput.addEventListener('input',()=>deptInput.value=deptInput.value.replace(/[^A-Za-z ]/g,''));
+idInput.addEventListener('input',()=>idInput.value=idInput.value.replace(/[^A-Za-z0-9]/g,''));
+phoneInput.addEventListener('input',()=>phoneInput.value=phoneInput.value.replace(/[^0-9]/g,'').slice(0,10));
+</script>
+{% endblock %}

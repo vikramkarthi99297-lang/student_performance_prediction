@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head"><div><h1>At-Risk Students</h1><p>Risk is calculated from live marks performance and attendance.</p></div></div>
+<div class="card table-wrap">
+<table>
+<tr><th>Student</th><th>Department</th><th>Attendance</th><th>Marks Performance</th><th>Risk</th><th>Mobile</th><th>Actions</th></tr>
+{% for s in students %}
+<tr>
+<td>{{s.name}}<small>{{s.student_id}}</small></td>
+<td>{{s.department}}</td>
+<td>{{s.attendance}}%</td>
+<td>{{performance_percent(s)}}%</td>
+<td><span class="badge {{risk_level(s)|lower}}">{{risk_level(s)}}</span></td>
+<td>{{s.phone}}</td>
+<td class="actions"><a href="tel:{{s.phone}}">Call</a><a href="{{url_for('student_profile',id=s.id)}}">View</a></td>
+</tr>
+{% else %}<tr><td colspan="7">No medium/high-risk students found.</td></tr>{% endfor %}
+</table>
+</div>
+{% endblock %}

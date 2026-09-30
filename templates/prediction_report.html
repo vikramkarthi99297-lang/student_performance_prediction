@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Prediction Report</h1><p>Generated {{now.strftime('%d %B %Y')}}</p></div>
+  <div><button class="button secondary" onclick="window.print()">Print</button><a class="primary" href="{{url_for('student_report',id=student.id)}}">Download PDF</a></div>
+</div>
+<div class="card report-print">
+<h2>Student Performance Prediction Report</h2>
+<h3>{{student.name}} <small>{{student.student_id}}</small></h3>
+<p>{{student.department}} · Year {{student.year}} · Semester {{student.semester}}</p>
+<hr>
+<div class="grid two">
+<div><h3>Verified academic data</h3><p>Attendance: {{student.attendance}}%</p><p>Marks performance: {{'%.1f'|format(student.mark_records|map(attribute='percentage')|sum / (student.mark_records|length) if student.mark_records else 0)}}%</p><p>Discipline: {{student.discipline}}</p></div>
+<div><h3>Prediction</h3>
+{% if prediction %}<p class="report-score">{{'%.1f'|format(prediction.predicted_score)}}%</p><p>{{prediction.performance_category}} · {{prediction.risk_level}} risk</p>
+{% else %}<p>Generate a prediction to include the result.</p>{% endif %}
+</div>
+</div>
+<h3>Recommended Academic Intervention</h3>
+<ul>{% for item in recommendations %}<li>{{item}}</li>{% endfor %}</ul>
+</div>
+{% endblock %}

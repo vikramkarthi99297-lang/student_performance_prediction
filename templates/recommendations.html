@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head"><div><h1>Academic Recommendations</h1><p>{{student.name}} · {{student.student_id}}</p></div>
+<a class="button secondary" href="{{url_for('student_profile',id=student.id)}}">Student Profile</a></div>
+<div class="grid two">
+<div class="card">
+<h3>Current assessment</h3>
+{% if prediction %}
+<p><b>Prediction:</b> {{'%.1f'|format(prediction.predicted_score)}}%</p>
+<p><b>Category:</b> {{prediction.performance_category}}</p>
+<p><b>Risk:</b> {{prediction.risk_level}}</p>
+{% else %}<p>No saved prediction exists yet. Recommendations use the current marks and attendance.</p>{% endif %}
+<h3>Current data</h3>
+<p>Marks performance: {{performance_percent(student) if performance_percent is defined else '—'}}%</p>
+<p>Attendance: {{student.attendance}}%</p>
+<p>Discipline: {{student.discipline}}</p>
+</div>
+<div class="card"><h3>Recommended actions</h3>
+<ol>{% for item in recommendations %}<li>{{item}}</li>{% endfor %}</ol>
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="page-head">
+    <div>
+        <h1>User Management</h1>
+        <p>Create system users without mobile OTP verification.</p>
+    </div>
+</div>
+
+<div class="grid two">
+
+<form method="post" class="card form-grid">
+
+<input type="hidden" name="_csrf_token" value="{{csrf_token}}">
+
+<h3>Add system user</h3>
+
+<label>
+Name
+<input
+    name="username"
+    required
+    pattern="[A-Za-z ]{2,80}"
+    value="{{pending.username or ''}}"
+    placeholder="Example: Arun Kumar"
+    title="Name must contain characters and spaces only."
+>
+</label>
+
+<label>
+Email
+<input
+    name="email"
+    type="email"
+    required
+    value="{{pending.email or ''}}"
+    placeholder="Example: faculty@example.com"
+>
+</label>
+
+<label>
+Mobile Number
+<input
+    name="phone"
+    type="tel"
+    required
+    pattern="[0-9]{10}"
+    maxlength="10"
+    value="{{pending.phone or ''}}"
+    placeholder="Example: 9876543210"
+>
+</label>
+
+<label>
+Role
+<select name="role">
+
+<option value="faculty"
+    {{'selected' if pending.role!='admin'}}>
+    Faculty
+</option>
+
+<option value="admin"
+    {{'selected' if pending.role=='admin'}}>
+    Administrator
+</option>
+
+</select>
+</label>
+
+<label>
+Department
+<input
+    name="department"
+    pattern="[A-Za-z ]*"
+    value="{{pending.department or ''}}"
+    placeholder="Example: Computer Science"
+>
+</label>
+
+<label>
+Temporary Password
+<input
+    name="temporary_password"
+    type="password"
+    minlength="8"
+    required
+    placeholder="Example: Temp@1234"
+>
+<small>
+The user must replace this with a permanent password on first login.
+</small>
+</label>
+
+<div class="form-actions">
+
+<button class="primary" type="submit">
+    Add System User
+</button>
+
+</div>
+
+</form>
+
+
+<div class="card table-wrap">
+
+<h3>System Users</h3>
+
+<table>
+
+<tr>
+    <th>Name</th>
+    <th>Role</th>
+    <th>Mobile</th>
+    <th>Department</th>
+    <th>Password</th>
+</tr>
+
+{% for u in users %}
+
+<tr>
+
+<td>
+    {{u.username}}
+    <small>{{u.email}}</small>
+</td>
+
+<td>
+    {{u.role|title}}
+</td>
+
+<td>
+    {{u.phone or '—'}}
+</td>
+
+<td>
+    {{u.department or '—'}}
+</td>
+
+<td>
+    {{'Temporary' if u.password_change_required else 'Permanent'}}
+</td>
+
+</tr>
+
+{% else %}
+
+<tr>
+    <td colspan="5">
+        No system users.
+    </td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+</div>
+
+
+<script>
+
+document.querySelector('input[name="username"]').addEventListener(
+    'input',
+    function(){
+        this.value = this.value.replace(/[^A-Za-z ]/g,'')
+    }
+);
+
+document.querySelector('input[name="department"]').addEventListener(
+    'input',
+    function(){
+        this.value = this.value.replace(/[^A-Za-z ]/g,'')
+    }
+);
+
+document.querySelector('input[name="phone"]').addEventListener(
+    'input',
+    function(){
+        this.value = this.value.replace(/[^0-9]/g,'').slice(0,10)
+    }
+);
+
+</script>
+
+{% endblock %}

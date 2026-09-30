@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Administrator Dashboard</h1><p>Department performance is calculated from verified student marks and attendance.</p></div>
+  <a class="primary" href="{{url_for('student_form')}}">+ Add Student</a>
+</div>
+
+<div class="stats">
+  {% for label,value in [('Students',stats.students),('Faculty',stats.faculty),('Departments',stats.departments),('Overall Performance',stats.performance ~ '%')] %}
+  <div class="stat"><span>{{label}}<b>{{value}}</b></span></div>
+  {% endfor %}
+</div>
+
+<div class="card table-wrap">
+  <h3>Department Performance</h3>
+  <p>Performance combines the department's average verified marks and average attendance.</p>
+  <table>
+    <tr><th>Department</th><th>Students</th><th>Marks</th><th>Attendance</th><th>Performance</th></tr>
+    {% for row in dept_rows %}
+    <tr><td>{{row.name}}</td><td>{{row.students}}</td><td>{{row.marks}}%</td><td>{{row.attendance}}%</td><td><strong>{{row.performance}}%</strong></td></tr>
+    {% else %}<tr><td colspan="5">No student data yet.</td></tr>{% endfor %}
+  </table>
+</div>
+
+<div class="card table-wrap">
+  <h3>Recent Marks Entry</h3>
+  <table>
+    <tr><th>Date</th><th>Student</th><th>Subject</th><th>Assessment</th><th>Marks</th><th>Result</th></tr>
+    {% for r in latest %}
+    <tr>
+      <td>{{r.created_at.strftime('%d %b %Y %H:%M')}}</td><td>{{r.student.student_id}} · {{r.student.name}}</td><td>{{r.subject_name}}</td><td>{{r.assessment}}</td><td>{{r.score}} / {{r.maximum_score}}</td>
+      <td><span class="badge {{'low' if r.passed else 'high'}}">{{'PASS' if r.passed else 'FAIL'}}</span></td>
+    </tr>
+    {% else %}<tr><td colspan="6">No marks entered yet.</td></tr>{% endfor %}
+  </table>
+</div>
+{% endblock %}

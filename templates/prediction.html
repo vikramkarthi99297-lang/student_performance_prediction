@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Student Performance Prediction</h1><p>{{student.student_id}} · {{student.name}} · verified subject marks</p></div>
+</div>
+
+<div class="grid two">
+<div class="card">
+<h3>Latest marks used for prediction</h3>
+<p>The prediction uses the average percentage of all verified marks for this student and the live attendance percentage.</p>
+<table>
+<tr><th>Subject</th><th>Assessment</th><th>Marks</th><th>Result</th></tr>
+{% for r in marks %}
+<tr><td>{{r.subject_name}}</td><td>{{r.assessment}}</td><td>{{r.score}} / {{r.maximum_score}}</td><td>{{'PASS' if r.passed else 'FAIL'}}</td></tr>
+{% else %}<tr><td colspan="4">No marks entered. Go to Marks Entry first.</td></tr>{% endfor %}
+</table>
+</div>
+
+<form class="card" method="post">
+<input type="hidden" name="_csrf_token" value="{{csrf_token}}">
+<h3>Generate result</h3>
+<p><b>Marks performance:</b> {{performance_percent(student)}}%</p>
+<p><b>Attendance:</b> {{student.attendance}}%</p>
+<button class="primary" {% if not marks %}disabled{% endif %}>Generate Prediction</button>
+</form>
+</div>
+
+<div class="card result">
+{% if result %}
+<i class="fa fa-chart-line"></i>
+<h3>Prediction Result</h3>
+<strong>{{'%.1f'|format(result.predicted_score)}}%</strong>
+<p><span class="badge {{result.risk_level|lower}}">{{result.performance_category}} · {{result.risk_level}} Risk</span></p>
+<p>Result source: verified subject marks + attendance.</p>
+<h4>Recommended actions</h4>
+<ul>{% for r in recommendations(student,result.risk_level) %}<li>{{r}}</li>{% endfor %}</ul>
+{% else %}
+<h3>Performance bands</h3>
+<ul>
+<li>Poor: below {{config.PERFORMANCE_THRESHOLDS.poor}}%</li>
+<li>Average: {{config.PERFORMANCE_THRESHOLDS.poor}}%–{{config.PERFORMANCE_THRESHOLDS.average - 0.01}}%</li>
+<li>Good: {{config.PERFORMANCE_THRESHOLDS.average}}%–{{config.PERFORMANCE_THRESHOLDS.good - 0.01}}%</li>
+<li>Excellent: {{config.PERFORMANCE_THRESHOLDS.good}}% and above</li>
+</ul>
+{% endif %}
+</div>
+{% endblock %}

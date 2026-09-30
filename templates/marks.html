@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head"><div><h1>Marks Entry</h1><p>Add one or more subjects. Each subject gets its own subject code and adjustable assessment pass limits.</p></div></div>
+
+<div class="card">
+<form method="post" class="form-grid" id="marksForm">
+<input type="hidden" name="_csrf_token" value="{{csrf_token}}">
+
+<label>Student
+<select name="student_id" required>
+{% for s in students %}<option value="{{s.id}}">{{s.student_id}} · {{s.name}} · {{s.department}}</option>{% endfor %}
+</select>
+</label>
+
+<label>Discipline
+<select name="discipline" required><option value="Good">Good</option><option value="Bad">Bad</option></select>
+</label>
+
+<div style="grid-column:1/-1">
+<h3>Subjects</h3>
+<div id="subjects"></div>
+<button type="button" class="button secondary" id="addSubject">+ Add Subject</button>
+</div>
+
+<div class="form-actions"><button class="primary">Save Marks & Verify PASS/FAIL</button></div>
+</form>
+</div>
+
+<div class="card table-wrap">
+<h3>Recent Marks</h3>
+<table>
+<tr><th>Date</th><th>Student</th><th>Subject</th><th>Code</th><th>Assessment</th><th>Marks</th><th>Pass Limit</th><th>Result</th><th>Discipline</th></tr>
+{% for r in records %}
+<tr><td>{{r.created_at.strftime('%d %b %Y %H:%M')}}</td><td>{{r.student.student_id}} · {{r.student.name}}</td><td>{{r.subject_name}}</td><td>{{r.subject_code}}</td><td>{{r.assessment}}</td><td>{{r.score}} / {{r.maximum_score}}</td><td>{{r.pass_mark}} / {{r.maximum_score}}</td><td><span class="badge {{'low' if r.passed else 'high'}}">{{'PASS' if r.passed else 'FAIL'}}</span></td><td>{{r.discipline}}</td></tr>
+{% else %}<tr><td colspan="9">No marks entered yet.</td></tr>{% endfor %}
+</table>
+</div>
+
+<template id="subjectTemplate">
+<div class="card subject-card" style="margin:0 0 16px;grid-column:1/-1">
+  <div class="page-head"><h3 class="subject-title">Subject 1</h3><button type="button" class="button secondary remove-subject">Remove</button></div>
+  <label>Subject Name
+    <input class="subject-name" required pattern="[A-Za-z ]{2,120}" placeholder="Example: Python Programming">
+  </label>
+  <label>Subject Code
+    <input class="subject-code" required pattern="[A-Za-z0-9-]{2,30}" placeholder="Example: CS101">
+  </label>
+  <div class="assessment-grid">
+  {% for assessment, info in defaults.items() %}
+    {% set key = assessment.lower().replace(' ','_') %}
+    <div class="card" style="margin:0">
+      <h4>{{assessment}}</h4>
+      <label>Obtained marks<input class="score" data-key="{{key}}" type="number" min="0" step="0.01" placeholder="Example: {{info.maximum}}"></label>
+      <label>Maximum marks<input class="max" data-key="{{key}}" type="number" min="1" step="0.01" value="{{info.maximum}}" required></label>
+      <label>Pass mark<input class="pass" data-key="{{key}}" type="number" min="0" step="0.01" value="{{info.pass}}" required></label>
+    </div>
+  {% endfor %}
+  </div>
+</div>
+</template>
+
+<script>
+const subjects = document.getElementById('subjects');
+const template = document.getElementById('subjectTemplate');
+let subjectCount = 0;
+function addSubject(){
+  const index = subjectCount++;
+  const fragment = template.content.cloneNode(true);
+  const card = fragment.querySelector('.subject-card');
+  card.querySelector('.subject-title').textContent = `Subject ${index + 1}`;
+  const name = card.querySelector('.subject-name');
+  const code = card.querySelector('.subject-code');
+  name.name = `subjects[${index}][subject_name]`;
+  code.name = `subjects[${index}][subject_code]`;
+  card.querySelectorAll('.score').forEach(el => el.name = `subjects[${index}][${el.dataset.key}_score]`);
+  card.querySelectorAll('.max').forEach(el => el.name = `subjects[${index}][${el.dataset.key}_max]`);
+  card.querySelectorAll('.pass').forEach(el => el.name = `subjects[${index}][${el.dataset.key}_pass]`);
+  card.querySelector('.remove-subject').addEventListener('click',()=>card.remove());
+  subjects.appendChild(fragment);
+}
+document.getElementById('addSubject').addEventListener('click', addSubject);
+addSubject();
+</script>
+{% endblock %}

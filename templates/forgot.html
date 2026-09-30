@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<form method="post" class="card narrow">
+
+    <input
+        type="hidden"
+        name="_csrf_token"
+        value="{{ csrf_token }}"
+    >
+
+    <h2>Reset Password</h2>
+
+    <p>
+        Enter your registered email address or mobile number.
+    </p>
+
+    <label>
+        Email or Mobile Number
+
+        <input
+            name="identifier"
+            type="text"
+            required
+            placeholder="Email or 10-digit mobile number"
+            autocomplete="username"
+        >
+    </label>
+
+    <button type="submit" class="primary">
+        Continue
+    </button>
+
+    <a href="{{ url_for('login') }}">
+        Back to Login
+    </a>
+
+</form>
+
+{% endblock %} 

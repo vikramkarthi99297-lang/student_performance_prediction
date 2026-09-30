@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head"><div><h1>Attendance Entry</h1><p>Attendance entered here updates the student's live attendance percentage.</p></div></div>
+<div class="grid two">
+<form class="card form-grid" method="post">
+<input type="hidden" name="_csrf_token" value="{{csrf_token}}">
+<h3>Record Attendance</h3>
+<label>Student<select name="student_id" required>{% for s in students %}<option value="{{s.id}}">{{s.student_id}} · {{s.name}}</option>{% endfor %}</select></label>
+<label>Status<select name="present" required><option value="present">Present</option><option value="absent">Absent</option></select></label>
+<button class="primary">Save Attendance</button>
+</form>
+<div class="card"><h3>Live verification</h3><p>Every entry is stored. The student's attendance percentage is recalculated immediately and used by the risk-level calculation.</p></div>
+</div>
+<div class="card table-wrap">
+<h3>Recent Attendance</h3>
+<table><tr><th>Date</th><th>Student</th><th>Status</th><th>Current %</th></tr>
+{% for r in records %}<tr><td>{{r.date.strftime('%d %b %Y')}}</td><td>{{r.student.student_id}} · {{r.student.name}}</td><td><span class="badge {{'low' if r.present else 'high'}}">{{'Present' if r.present else 'Absent'}}</span></td><td>{{r.student.attendance}}%</td></tr>
+{% else %}<tr><td colspan="4">No attendance records yet.</td></tr>{% endfor %}
+</table>
+</div>
+{% endblock %}

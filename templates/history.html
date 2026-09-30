@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head"><div><h1>Prediction History</h1><p>Saved results from the marks-and-attendance rules.</p></div></div>
+<div class="card table-wrap">
+<table>
+<tr><th>Date</th><th>Student</th><th>Score</th><th>Category</th><th>Risk</th></tr>
+{% for p in predictions %}
+<tr>
+<td>{{p.predicted_at.strftime('%d-%m-%Y %H:%M')}}</td>
+<td><a href="{{url_for('student_profile',id=p.student.id)}}">{{p.student.student_id}} · {{p.student.name}}</a></td>
+<td>{{'%.1f'|format(p.predicted_score)}}%</td>
+<td>{{p.performance_category}}</td>
+<td><span class="badge {{p.risk_level|lower}}">{{p.risk_level}}</span></td>
+</tr>
+{% else %}<tr><td colspan="5">No prediction records yet.</td></tr>{% endfor %}
+</table>
+</div>
+{% endblock %}

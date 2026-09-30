@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="profile-head">
+  <div class="avatar">{{student.name[0]}}</div>
+  <div><h1>{{student.name}}</h1><p>{{student.student_id}} · {{student.department}} · Year {{student.year}} / Semester {{student.semester}}</p></div>
+  <a class="primary" href="{{url_for('prediction',id=student.id)}}">Predict Performance</a>
+</div>
+
+<div class="stats">
+  {% for label,value in [('Attendance',student.attendance~'%'),('Marks Performance',performance_percent(student)~'%'),('Performance',performance_category(performance_percent(student))),('Risk',risk_level(student))] %}
+  <div class="stat"><span>{{label}}<b>{{value}}</b></span></div>
+  {% endfor %}
+</div>
+
+<div class="grid two">
+<div class="card">
+<h3>Personal Information</h3>
+<dl>
+<dt>Student ID</dt><dd>{{student.student_id}}</dd>
+<dt>Email</dt><dd>{{student.email}}</dd>
+<dt>Mobile</dt><dd>{{student.phone}}</dd>
+<dt>Address</dt><dd>{{student.address}}</dd>
+<dt>Discipline</dt><dd>{{student.discipline}}</dd>
+<dt>Number of Arrears</dt><dd>{{student.arrears}}</dd>
+</dl>
+</div>
+
+<div class="card">
+<h3>Academic Information</h3>
+<dl>
+<dt>Department</dt><dd>{{student.department}}</dd>
+<dt>Year</dt><dd>{{student.year}}</dd>
+<dt>Semester</dt><dd>{{student.semester}}</dd>
+<dt>Attendance</dt><dd>{{student.attendance}}%</dd>
+<dt>Performance category</dt><dd>{{performance_category(performance_percent(student))}}</dd>
+<dt>Risk level</dt><dd>{{risk_level(student)}}</dd>
+</dl>
+</div>
+</div>
+
+<div class="card table-wrap">
+<h3>Verified Subject Marks</h3>
+<table>
+<tr><th>Subject</th><th>Assessment</th><th>Marks</th><th>Pass Limit</th><th>Result</th><th>Discipline</th><th>Date</th></tr>
+{% for r in marks %}
+<tr>
+<td>{{r.subject_name}}<small>{{r.subject_code}}</small></td>
+<td>{{r.assessment}}</td>
+<td>{{r.score}} / {{r.maximum_score}}</td>
+<td>{{r.pass_mark}} / {{r.maximum_score}}</td>
+<td><span class="badge {{'low' if r.passed else 'high'}}">{{'PASS' if r.passed else 'FAIL'}}</span></td>
+<td>{{r.discipline}}</td>
+<td>{{r.created_at.strftime('%d %b %Y')}}</td>
+</tr>
+{% else %}<tr><td colspan="7">No marks have been entered yet.</td></tr>{% endfor %}
+</table>
+</div>
+
+<div class="grid two">
+<div class="card">
+<h3>Recommendations</h3>
+<ul>{% for r in recommendations(student,risk_level(student)) %}<li>{{r}}</li>{% endfor %}</ul>
+</div>
+<div class="card">
+<h3>Prediction History</h3>
+<table><tr><th>Date</th><th>Score</th><th>Category</th><th>Risk</th></tr>
+{% for p in predictions %}<tr><td>{{p.predicted_at.strftime('%d %b %Y')}}</td><td>{{'%.1f'|format(p.predicted_score)}}%</td><td>{{p.performance_category}}</td><td>{{p.risk_level}}</td></tr>
+{% else %}<tr><td colspan="4">No predictions saved.</td></tr>{% endfor %}
+</table>
+</div>
+</div>
+{% endblock %}
